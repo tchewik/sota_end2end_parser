@@ -6,7 +6,7 @@ from util.file_util import *
 SAVE_MODEL = True
 VERSION, SET = 0, 2
 SEED = 19
-USE_CUDA, CUDA_ID = True, 3
+USE_CUDA, CUDA_ID = False, 'cpu'
 EDU_ENCODE_VERSION, SPLIT_V = 2, 1
 CHUNK_SIZE = 768  # 64
 MAX_LEN = 32

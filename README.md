@@ -1,58 +1,30 @@
-## Introduction
+## Wrapper for the parser by Zhang et al. (2021)
 
-In this project, we provide an end2end DRS parser where the EDU segmenter
-in "Zhang et al., **Syntax-Guided Sequence to Sequence Modeling for Discourse Segmentation**" 
-and the DRS parser in "Zhang et al., **Adversarial Learning for Discourse Rhetorical Structure Parsing**" are applied.
+[The source](https://github.com/NLP-Discourse-SoochowU/sota_end2end_parser). 
 
-Any questions, just send e-mails to zzlynx@outlook.com (Longyin Zhang).
+### Docker
 
+[Docker image for a remote isanlp processor](https://hub.docker.com/r/tchewik/isanlp_zhang21).
 
-#### Usage
+### Local run
 
-1. Before running this end2end parser, you need to download the following
-packages in your software environment:
+1. Download the weights into `data/models_saved/model.pth` and `data/models_saved/xl_model.pth`. [Link 1 (Baidu)](https://github.com/NLP-Discourse-SoochowU/sota_end2end_parser/blob/main/README.md), [link 2 (Dropbox)](https://github.com/NLP-Discourse-SoochowU/sota_end2end_parser/issues/2).
+2. Configure the environment: `source setup_environment.sh`. If necessary, install the environment as a jupyter kernel: `pip install ipykernel && python -m ipykernel install --name "rst_parser_zhang"`
+3. Use in the code:
+```python
+from isanlp import PipelineCommon
+from isanlp.processor_spacy import ProcessorSpaCy
+from isanlp_processor import ProcessorRST
 
-- Python 3.6.10
-- transformers 3.0.2
-- pytorch 1.5.0
-- numpy 1.19.1
-- cudatoolkit 9.2 cudnn 7.6.5
-- stanford-corenlp-full-2018-02-27
-- other necessary python packages (etc.)
-If you have troubles in downloading the stanford CoreNLP toolkits, we provide
-a duplication of it for you at "https://pan.baidu.com/s/1FGZe9vBZap2ZNv_D3XyRjA",
-and the extraction code is **n6hx**.
+ppl = PipelineCommon([
+    (ProcessorSpaCy(model_name='en_core_web_sm', morphology=True, parser=False, ner=False, delay_init=False),
+     ['text'],
+     {'tokens': 'tokens',
+      'sentences': 'sentences'}),
+    (ProcessorRST(),
+     ['text', 'tokens', 'sentences'],
+     {'rst': 'rst'})
+])
 
-2. Due to the file size limitation, we put the pre-trained model at
-https://pan.baidu.com/s/1u0FLgPydISKR-MVcs2SFdg, and the password is **lynx**.
-After obtaining the pre-trained models, you need to put the two files at the
-following two places. **It should be noted that since many real-life data usually do not contain standard paragraph boundaries, we only provide the pre-trained model with sentence boundaries considered, which is closer to practical application.**
+result = ppl(some_text)
 ```
-   (parser) data/models_saved/model.pth
-   (LM) data/models_saved/xl_model.pth
-```
-
-3. Prepare your own data with reference to the examples in "data/e2e", where
-"raw.txt" refers to the article with several sentences, "edu.txt" refers to the
-texts after EDU segmentation, and "trees.pkl" refers to the generated DRS trees. 
-When everything is ready, run the following command: (Highlight: you only need to 
-prepare the raw.txt, others will be formed after you run pipeline.py)
-```
-   python pipeline.py
-```
-
-
-<b>-- License</b>
-```
-   Copyright (c) 2019, Soochow University NLP research group. All rights reserved.
-   Redistribution and use in source and binary forms, with or without modification,
-   are permitted provided that the following conditions are met:
-   1. Redistributions of source code must retain the above copyright notice, this
-      list of conditions and the following disclaimer.
-   2. Redistributions in binary form must reproduce the above copyright notice, this
-      list of conditions and the following disclaimer in the documentation and/or other
-      materials provided with the distribution.
-```
-
-
-

@@ -15,29 +15,36 @@ from allennlp.modules.elmo import Elmo
 import numpy as np
 import torch
 from transformers import *
-import progressbar
+# import progressbar
 from structure.rst_tree import rst_tree
 from config import ids2nr, XLNET_TYPE, USE_CUDA, CUDA_ID
 import gc
 
-p = progressbar.ProgressBar()
+# p = progressbar.ProgressBar()
 
 tokenizer_xl = XLNetTokenizer.from_pretrained(XLNET_TYPE)
-model_xl = torch.load("data/models_saved/xl_model.pth")
+if USE_CUDA:
+    model_xl = torch.load("data/models_saved/xl_model.pth")
+else:
+    model_xl = torch.load("data/models_saved/xl_model.pth", map_location=torch.device('cpu'))
+
 model_xl.eval()
 if USE_CUDA:
     model_xl.cuda(CUDA_ID)
 
-options_file = "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/" \
-               "elmo_2x4096_512_2048cnn_2xhighway_options.json"
-weight_file = "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo" \
-              "_2x4096_512_2048cnn_2xhighway_weights.hdf5"
+# options_file = "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/" \
+#                "elmo_2x4096_512_2048cnn_2xhighway_options.json"
+# weight_file = "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo" \
+#               "_2x4096_512_2048cnn_2xhighway_weights.hdf5"
+options_file = 'data/elmo/elmo_2x4096_512_2048cnn_2xhighway_options.json'
+weight_file = 'data/elmo/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5'
+
 elmo = Elmo(options_file, weight_file, 2, dropout=0)
 path_to_jar = 'stanford-corenlp-full-2018-02-27'
 nlp = StanfordCoreNLP(path_to_jar)
 word2ids, pos2ids, syn2ids = load_data(WORD2IDS), load_data(POS2IDS), load_data(SYN2IDS)
 ELMO_ROOT_PAD = torch.zeros(1, 1024)
-p = progressbar.ProgressBar()
+# p = progressbar.ProgressBar()
 
 
 class PartitionPtrParser:
@@ -141,6 +148,7 @@ def prep_seg(dt_path=None):
     with open(dt_path, "r") as f:
         sentences = f.readlines()
     sents_dt = []
+
     for idx, sent in enumerate(sentences):
         sent = sent.strip()
         if len(sent) == 0:
@@ -331,7 +339,7 @@ if __name__ == "__main__":
     # segmenting
     sents_dt = prep_seg(raw_dt)
     seg_edus = do_seg(sents_dt, edu_dt)
-    
+
     # parsing
     trees_ = do_parse(seg_edus)
     save_data(trees_, "data/e2e/trees.pkl")

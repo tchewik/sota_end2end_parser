@@ -5,7 +5,7 @@
 @Date:
 @Description:
 """
-VERSION, SET, USE_GPU, CUDA_ID = 10, 200, True, 3
+VERSION, SET, USE_GPU, CUDA_ID = 10, 200, False, 'cpu'
 HIDDEN_SIZE, Head_NUM, GCN_LAYER, K, RNN_LAYER, RNN_TYPE = 384, 2, 2, 64, 2, "GRU"
 USE_ELMo, USE_POS = True, True
 Partial_IN = False
