@@ -13,18 +13,34 @@
 3. Use in the code:
 ```python
 from isanlp import PipelineCommon
-from isanlp.processor_spacy import ProcessorSpaCy
+from isanlp.processor_udpipe import ProcessorUDPipe
 from isanlp_processor import ProcessorRST
 
+
 ppl = PipelineCommon([
-    (ProcessorSpaCy(model_name='en_core_web_sm', morphology=True, parser=False, ner=False, delay_init=False),
+    #(ProcessorSpaCy(model_name='en_core_web_sm', morphology=True, parser=False, ner=False, delay_init=False),
+    (ProcessorUDPipe(model_path='data/english-ewt-ud-2.5-191206.udpipe', parser=False),
      ['text'],
      {'tokens': 'tokens',
       'sentences': 'sentences'}),
     (ProcessorRST(),
      ['text', 'tokens', 'sentences'],
-     {'rst': 'rst'})
+     {0: 'rst'})
 ])
 
+some_text = "Brown fox jumped over the tree because it had to."
 result = ppl(some_text)
+```
+
+```python
+>>> print(result['rst'][0])
+id: 1
+text: Brown fox jumped over the tree because it had to.
+proba: 1.0
+relation: Explanation
+nuclearity: NS
+left: Brown fox jumped over the tree
+right: because it had to.
+start: 0
+end: 49
 ```

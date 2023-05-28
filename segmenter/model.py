@@ -119,7 +119,7 @@ class Segment_Model(nn.Module):
     def select_boundary(attn, state_idx, seq_len):
         decode_mask = [0 for _ in range(state_idx)]
         decode_mask = decode_mask + [1 for _ in range(state_idx, seq_len)]
-        decode_mask = torch.Tensor(decode_mask).float().cuda(CUDA_ID)
+        decode_mask = torch.Tensor(decode_mask).float().to(CUDA_ID)
         mask_pad_ = (1 - decode_mask) * SMOO_VAL
         masked_attn = attn.mul(decode_mask) + mask_pad_  # make it small enough
         boundary_predict = torch.argmax(masked_attn.log_softmax(dim=-1)).unsqueeze(0)
